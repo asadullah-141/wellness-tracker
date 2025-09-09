@@ -1,0 +1,96 @@
+{% extends 'WellnessApp/base.html' %}
+{% block content %}
+{% load static %}
+{% if messages %}
+  {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+      {{ message }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  {% endfor %}
+{% endif %}
+
+<!-- Heading and Back Button Row -->
+  <div class="d-flex align-items-center mb-4">
+    <!-- Back Icon -->
+    <a href="{% url 'dashboard' %}" class="me-3">
+      <img src="{% static 'images/previous-button-icon.png' %}" alt="Back" width="32" height="32">
+    </a>
+  </div>
+
+<div class="container mt-4">
+  <h3 class="fw-bold mb-4">Calorie Burn Calculator 🔥</h3>
+
+  <form method="post" class="mb-4">
+    {% csrf_token %}
+    <div class="row g-3">
+      <div class="col-md-5">
+        {{ form.exercise_type.label_tag }}
+        {{ form.exercise_type }}
+      </div>
+      <div class="col-md-4">
+        {{ form.duration.label_tag }}
+        {{ form.duration }}
+      </div>
+      <div class="col-md-3 d-flex align-items-end">
+        <button type="submit" class="btn btn-secondary w-100">Calculate</button>
+      </div>
+    </div>
+  </form>
+
+  {% if result %}
+    <div class="alert alert-success">
+      <strong>{{ result.exercise }}</strong> for <strong>{{ result.duration }} minutes</strong>
+      burned <strong>{{ result.calories }} kcal</strong> based on your weight.
+      <br>
+      <span class="text-muted small">
+        Your daily goal: {{ result.goal }} kcal —
+        You've reached {{ result.progress }}%!
+      </span>
+    </div>
+
+    <div class="progress mb-4" style="height: 25px;">
+      <div class="progress-bar bg-success" role="progressbar"
+           style="width: {{ result.progress }}%" aria-valuenow="{{ result.progress }}"
+           aria-valuemin="0" aria-valuemax="100">
+        {{ result.progress }}%
+      </div>
+    </div>
+  {% endif %}
+
+  {% if chart_data %}
+    <div class="mt-3">
+      <h5 class="mb-2">Calorie Comparison</h5>
+      <canvas id="calorieChart" height="180" style="max-height: 200px;"></canvas>
+    </div>
+  {% endif %}
+
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  const ctx = document.getElementById('calorieChart');
+  const calorieChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: [{% for item in chart_data %}"{{ item.exercise }}"{% if not forloop.last %}, {% endif %}{% endfor %}],
+      datasets: [{
+        label: 'Calories Burned',
+        data: [{% for item in chart_data %}{{ item.calories }}{% if not forloop.last %}, {% endif %}{% endfor %}],
+        backgroundColor: '#f39c12'
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        y: {
+          beginAtZero: true,
+          title: { display: true, text: 'kcal' }
+        }
+      }
+    }
+  });
+</script>
+{% endblock %}

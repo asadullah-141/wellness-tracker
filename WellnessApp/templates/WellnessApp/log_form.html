@@ -1,0 +1,32 @@
+{% extends 'WellnessApp/base.html' %}
+{% load widget_tweaks %}
+{% block content %}
+
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <div class="card shadow-sm">
+      <div class="card-header bg-body-secondary border-bottom">
+        <h5 class="mb-0">{% if form.instance.pk %}Edit{% else %}Add{% endif %} Wellness Log</h5>
+      </div>
+      <div class="card-body">
+        <form method="post" novalidate>
+          {% csrf_token %}
+          {% for field in form %}
+          <div class="mb-3">
+            <label class="form-label fw-semibold">{{ field.label }}</label>
+            {{ field|add_class:"form-control rounded-3 shadow-sm" }}
+            {% for error in field.errors %}
+              <div class="text-danger small">{{ error }}</div>
+            {% endfor %}
+          </div>
+          {% endfor %}
+          <div class="d-flex justify-content-between mt-4">
+            <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">← Back</a>
+            <button type="submit" class="btn btn-dark">{% if form.instance.pk %}Update{% else %}Save Log{% endif %}</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

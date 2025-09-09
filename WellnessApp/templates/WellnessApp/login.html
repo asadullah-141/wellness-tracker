@@ -1,0 +1,104 @@
+{% extends 'WellnessApp/base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+{% block content %}
+<style>
+  .login-container {
+    height: calc(100vh - 100px); /* subtract navbar height */
+    overflow: hidden;
+  }
+
+  .left-side,
+  .right-side {
+    height: 100%;
+    padding: 2rem;
+  }
+
+  .left-side {
+    text-align: center;
+    background: none !important; /* removed grey background */
+  }
+
+  .left-side img {
+    max-height: 300px;
+    object-fit: contain;
+  }
+
+  .right-side {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #fff;
+  }
+
+  .login-card {
+    width: 100%;
+    max-width: 420px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 2rem 1.5rem;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+    border-radius: 12px;
+  }
+
+  @media (max-width: 768px) {
+    .left-side,
+    .right-side {
+      height: auto;
+    }
+
+    .login-card {
+      height: auto;
+      margin-top: 2rem;
+    }
+  }
+</style>
+
+<div class="container-fluid login-container">
+  <div class="row h-100">
+
+    <!-- Left: Visual Panel -->
+    <div class="col-md-6 left-side d-flex flex-column justify-content-center align-items-center">
+  <img src="https://plus.unsplash.com/premium_vector-1720622697585-7127b9bc9f94?q=80&w=880&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+           alt="Wellness Illustration" class="img-fluid mb-4">
+      <h2 class="fw-bold">Welcome Back 🌿</h2>
+      <p class="text-muted px-5">Log in and continue your wellness journey.</p>
+    </div>
+
+    <!-- Right: Full-Height Form Panel -->
+    <div class="col-md-6 right-side">
+      <div class="login-card mx-auto">
+        <h4 class="mb-4 text-center">Login to Your Account</h4>
+        <form method="post" novalidate>
+  {% csrf_token %}
+
+  {% if form.non_field_errors %}
+    <div class="text-danger mb-3 small">
+      {% for error in form.non_field_errors %}
+        {{ error }}
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  {% for field in form %}
+    <div class="mb-3">
+      <label class="form-label fw-semibold">{{ field.label }}</label>
+      {{ field|add_class:"form-control rounded-3 shadow-sm" }}
+      {% for error in field.errors %}
+        <div class="text-danger small">{{ error }}</div>
+      {% endfor %}
+    </div>
+  {% endfor %}
+
+  <button type="submit" class="btn btn-dark w-100">Login</button>
+</form>
+
+        <p class="mt-4 text-center">Don’t have an account? <a href="{% url 'register' %}">Register now</a></p>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

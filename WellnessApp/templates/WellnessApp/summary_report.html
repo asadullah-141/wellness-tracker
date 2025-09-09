@@ -1,0 +1,134 @@
+{% extends 'WellnessApp/base.html' %}
+{% load static %}
+{% block content %}
+<!-- Heading and Back Button Row -->
+  <div class="d-flex align-items-center mb-4">
+    <!-- Back Icon -->
+    <a href="{% url 'dashboard' %}" class="me-3">
+      <img src="{% static 'images/previous-button-icon.png' %}" alt="Back" width="32" height="32">
+    </a>
+  </div>
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="fw-bold">Your {{ period|title }} Summary</h3>
+    <div>
+      <a href="?period=week" class="btn btn-outline-secondary {% if period == 'week' %}active{% endif %}">Weekly</a>
+      <a href="?period=month" class="btn btn-outline-secondary {% if period == 'month' %}active{% endif %}">Monthly</a>
+    </div>
+  </div>
+
+
+
+  <p class="text-muted small">Based on your most recent {{ logs|length }} logs</p>
+
+
+  
+  <div class="row g-4">
+    <div class="col-md-6 col-lg-3">
+      <div class="card shadow-sm text-center">
+        <div class="card-body">
+          <canvas id="waterChart" height="200"></canvas>
+          <p class="mt-2 fw-semibold">Avg Water: {{ avg_water }}L</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+      <div class="card shadow-sm text-center">
+        <div class="card-body">
+          <canvas id="sleepChart" height="200"></canvas>
+          <p class="mt-2 fw-semibold">Avg Sleep: {{ avg_sleep }} hrs</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+      <div class="card shadow-sm text-center">
+        <div class="card-body">
+          <canvas id="exerciseChart" height="200"></canvas>
+          <p class="mt-2 fw-semibold">Avg Exercise: {{ total_exercise }} min</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+      <div class="card shadow-sm text-center">
+        <div class="card-body">
+          <canvas id="moodChart" height="200"></canvas>
+          <p class="mt-2 fw-semibold">Mood Breakdown</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<br><br><br><br>
+
+
+    
+
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const pieOptions = {
+  responsive: true,
+  plugins: {
+    legend: {
+      position: 'bottom'
+    }
+  }
+};
+
+new Chart(document.getElementById("waterChart"), {
+  type: 'doughnut',
+  data: {
+    labels: ["Water Intake"],
+    datasets: [{
+      label: "Water Intake (liters)",
+      data: [{{ avg_water }}, 3 - {{ avg_water }}],
+      backgroundColor: ["#3498db", "#ecf0f1"]
+    }]
+  },
+  options: pieOptions
+});
+
+new Chart(document.getElementById("sleepChart"), {
+  type: 'doughnut',
+  data: {
+    labels: ["Sleep"],
+    datasets: [{
+      label: "Sleep",
+      data: [{{ avg_sleep }}, 10 - {{ avg_sleep }}],
+      backgroundColor: ["#27ae60", "#ecf0f1"]
+    }]
+  },
+  options: pieOptions
+});
+
+new Chart(document.getElementById("exerciseChart"), {
+  type: 'doughnut',
+  data: {
+    labels: ["Exercise"],
+    datasets: [{
+      label: "Exercise",
+      data: [{{ total_exercise }}, 60 - {{ total_exercise }}],
+      backgroundColor: ["#f39c12", "#ecf0f1"]
+    }]
+  },
+  options: pieOptions
+});
+
+new Chart(document.getElementById("moodChart"), {
+  type: 'doughnut',
+  data: {
+    labels: ["Happy", "Neutral", "Sad"],
+    datasets: [{
+      label: "Mood",
+      data: [{{ mood_data.Happy }}, {{ mood_data.Neutral }}, {{ mood_data.Sad }}],
+      backgroundColor: ["#f1c40f", "#95a5a6", "#e74c3c"]
+    }]
+  },
+  options: pieOptions
+});
+</script>
+{% endblock %}
